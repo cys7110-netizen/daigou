@@ -1,111 +1,112 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+<meta charset="utf-8">
 <title>韓吉代購換算</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='10' y='4' width='44' height='56' rx='10' fill='%23c94f6b' stroke='%234a2228' stroke-width='4'/%3E%3Crect x='17' y='11' width='30' height='13' rx='4' fill='%23fff0ee' stroke='%234a2228' stroke-width='3'/%3E%3Cg fill='%23fff0ee' stroke='%234a2228' stroke-width='2.5'%3E%3Crect x='17' y='30' width='8' height='8' rx='2'/%3E%3Crect x='28' y='30' width='8' height='8' rx='2'/%3E%3Crect x='39' y='30' width='8' height='8' rx='2'/%3E%3Crect x='17' y='42' width='8' height='8' rx='2'/%3E%3Crect x='28' y='42' width='8' height='8' rx='2'/%3E%3Crect x='39' y='42' width='8' height='8' rx='2' fill='%23ffd9df'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="st/icon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="韓吉代購">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-title" content="韓吉代購">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script>(function(){var l=document.createElement("link");l.rel="stylesheet";l.href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap";document.head.appendChild(l)})()</script>
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html,body{margin:0}
-/* Layout: one chunky sticker-card calculator, mascot reacts on top, quick-price table below */
+/* Layout: one-screen sticker calculator; header + input card + result card, all settings in a bottom sheet */
 :root{
   --bg:#fff6f4; --dots:#f6dcdc;
   --card:#ffffff; --ink:#4a2228; --muted:#8c5c63;
-  --potato:#c94f6b; --potato-hi:#e0788f; --cheek:#ff8a95;
-  --sun:#ffc93c; --sky:#5aa9e6; --field:#fff0ee;
+  --potato:#c94f6b; --mint:#bfe6cf; --sun:#ffc93c; --sky:#5aa9e6; --field:#fff0ee; --blush:#ffd9df;
   --display:"Fredoka","M PLUS Rounded 1c","Noto Sans TC","PingFang TC",system-ui,sans-serif;
   --body:"M PLUS Rounded 1c","Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#2a1a1e; --dots:#3a252b; --card:#3a2329; --ink:#ffe9ec; --muted:#d7a9b1;
-  --potato:#d9607b; --potato-hi:#f08ba1; --cheek:#ff9aa5; --sun:#ffd25e; --sky:#7cbcf0; --field:#4a2d34; color-scheme:dark}}
+  --potato:#d9607b; --mint:#3d6b52; --sun:#ffd25e; --sky:#7cbcf0; --field:#4a2d34; --blush:#5a3640; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#2a1a1e; --dots:#3a252b; --card:#3a2329; --ink:#ffe9ec; --muted:#d7a9b1;
-  --potato:#d9607b; --potato-hi:#f08ba1; --cheek:#ff9aa5; --sun:#ffd25e; --sky:#7cbcf0; --field:#4a2d34; color-scheme:dark}
+  --potato:#d9607b; --mint:#3d6b52; --sun:#ffd25e; --sky:#7cbcf0; --field:#4a2d34; --blush:#5a3640; color-scheme:dark}
 
 *{box-sizing:border-box}
 body{background:var(--bg);background-image:radial-gradient(var(--dots) 2px,transparent 2.5px);background-size:22px 22px;color:var(--ink);font-family:var(--body);
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
-.wrap{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 20px}
+.wrap{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
 
-header{display:flex;align-items:center;gap:12px}
-.mascot{width:112px;height:112px;object-fit:contain;flex:none;animation:bob 2.6s ease-in-out infinite;transition:transform .2s}
+header{display:flex;align-items:center;gap:8px}
+.mascot{width:76px;height:76px;object-fit:contain;flex:none;animation:bob 2.6s ease-in-out infinite;transition:transform .2s}
 .mascot.swap{transform:scale(.85)}
-.deco{width:58px;height:58px;object-fit:contain;flex:none}
-.sec-h{display:flex;align-items:center;gap:8px}
-.result-st{position:absolute;right:6px;top:4px;width:86px;height:86px;object-fit:contain;transform:rotate(8deg)}
-@keyframes bob{50%{transform:translateY(-4px) rotate(-2deg)}}
-.bubble{position:relative;background:var(--card);border:3px solid var(--ink);border-radius:18px;padding:10px 16px;margin-left:6px;box-shadow:3px 3px 0 var(--ink);flex:1;min-width:0}
+@keyframes bob{50%{transform:translateY(-3px) rotate(-2deg)}}
+.bubble{position:relative;background:var(--card);border:3px solid var(--ink);border-radius:16px;padding:7px 12px;box-shadow:3px 3px 0 var(--ink);flex:1;min-width:0;margin-left:6px}
 .bubble::before,.bubble::after{content:"";position:absolute;top:50%;width:0;height:0;border-style:solid;border-color:transparent}
 .bubble::before{left:-17px;margin-top:-10px;border-width:10px 14px 10px 0;border-right-color:var(--ink)}
 .bubble::after{left:-11px;margin-top:-7px;border-width:7px 10px 7px 0;border-right-color:var(--card)}
-.bubble h1{margin:0;font-family:var(--display);font-weight:700;font-size:1.45rem;text-wrap:balance;letter-spacing:.02em}
-.bubble p{margin:2px 0 0;color:var(--muted);font-size:.86rem}
+.bubble h1{margin:0;font-family:var(--display);font-weight:700;font-size:1.2rem;letter-spacing:.02em}
+.bubble p{margin:1px 0 0;color:var(--muted);font-size:.8rem;line-height:1.35}
+.gear{flex:none;width:48px;height:48px;border-radius:16px;border:3px solid var(--ink);background:var(--mint);box-shadow:3px 3px 0 var(--ink);display:grid;place-items:center;cursor:pointer;color:var(--ink)}
+.gear:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.gear svg{width:24px;height:24px}
 
-.card{background:var(--card);border:3px solid var(--ink);border-radius:24px;box-shadow:5px 5px 0 var(--ink);padding:18px;display:flex;flex-direction:column;gap:14px}
-
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--field);border:3px solid var(--ink);border-radius:999px;padding:4px}
-.tabs button{font:700 1rem var(--body);color:var(--ink);background:transparent;border:0;border-radius:999px;padding:9px 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.card{background:var(--card);border:3px solid var(--ink);border-radius:22px;box-shadow:4px 4px 0 var(--ink);padding:14px;display:flex;flex-direction:column;gap:10px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--field);border:3px solid var(--ink);border-radius:999px;padding:3px}
+.tabs button{font:700 .95rem var(--body);color:var(--ink);background:transparent;border:0;border-radius:999px;padding:7px 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
 .tabs button[aria-pressed="true"]{background:var(--potato);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
-.tabs .flag{font-family:var(--display);font-size:.8rem;background:var(--card);color:var(--ink);border-radius:999px;padding:1px 7px;border:2px solid var(--ink)}
+.tabs .flag{font-family:var(--display);font-size:.75rem;background:var(--card);color:var(--ink);border-radius:999px;padding:0 6px;border:2px solid var(--ink)}
 
-label{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:.85rem;min-width:0}
-label small{font-weight:500;color:var(--muted);font-size:.75rem}
-.field{display:flex;align-items:center;background:var(--field);border:3px solid var(--ink);border-radius:16px;padding:0 12px;min-width:0}
+label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.82rem;min-width:0}
+label small{font-weight:500;color:var(--muted);font-size:.74rem}
+.field{display:flex;align-items:center;background:var(--field);border:3px solid var(--ink);border-radius:14px;padding:0 10px;min-width:0}
 .field:focus-within{box-shadow:0 0 0 3px var(--sun)}
 .field span{font-family:var(--display);font-weight:600;color:var(--muted);white-space:nowrap}
-.field input{flex:1;min-width:0;width:100%;border:0;background:transparent;color:var(--ink);font:600 1.1rem var(--display);padding:10px 6px;outline:none;font-variant-numeric:tabular-nums}
-.big .field input{font-size:1.9rem;padding:8px 6px}
-.big .field span{font-size:1.4rem}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.hint{font-size:.75rem;color:var(--muted);margin:-4px 0 0;line-height:1.5}
-.hint a{color:var(--potato);font-weight:700}
+.field input{flex:1;min-width:0;width:100%;border:0;background:transparent;color:var(--ink);font:600 1.05rem var(--display);padding:9px 6px;outline:none;font-variant-numeric:tabular-nums}
+.price-row{display:grid;grid-template-columns:1fr 112px;gap:8px;align-items:end}
+.big .field input{font-size:1.7rem;padding:5px 6px}
+.big .field span{font-size:1.3rem}
+.stepper{display:flex;align-items:center;background:var(--field);border:3px solid var(--ink);border-radius:14px;height:100%;min-height:52px}
+.stepper button{width:32px;height:100%;border:0;background:transparent;font:700 1.3rem var(--display);color:var(--ink);cursor:pointer}
+.stepper input{flex:1;min-width:0;width:100%;border:0;background:transparent;text-align:center;font:600 1.2rem var(--display);color:var(--ink);outline:none;-moz-appearance:textfield}
+.stepper input::-webkit-inner-spin-button,.stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.summary{display:flex;flex-wrap:wrap;gap:6px;border:0;background:none;padding:0;cursor:pointer;text-align:left}
+.chip{font:700 .76rem var(--body);background:var(--blush);color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:3px 9px;font-variant-numeric:tabular-nums;white-space:nowrap}
 
-details{border-top:3px dashed var(--dots);padding-top:10px}
-summary{cursor:pointer;font-weight:800;font-size:.9rem;list-style:none;display:flex;align-items:center;gap:6px}
-summary::-webkit-details-marker{display:none}
-summary::before{content:"▸";transition:transform .2s}
-details[open] summary::before{transform:rotate(90deg)}
-.adv{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.result{position:relative;background:var(--potato);color:#fff;border:3px solid var(--ink);border-radius:22px;box-shadow:4px 4px 0 var(--ink);padding:14px;overflow:hidden}
+.result-st{position:absolute;right:4px;top:2px;width:76px;height:76px;object-fit:contain;transform:rotate(8deg)}
+.result .lbl{font-weight:800;font-size:.8rem;opacity:.92;letter-spacing:.05em}
+.result .price{font-family:var(--display);font-weight:700;font-size:clamp(2.2rem,10vw,2.8rem);line-height:1.1;font-variant-numeric:tabular-nums;margin:0 0 8px;padding-right:72px;transition:transform .15s;transform-origin:left}
+.result .price.pop{transform:scale(1.05)}
+.result .price small{font-size:.45em;margin-right:4px;opacity:.9}
+.break{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.break div{background:rgba(0,0,0,.14);border-radius:12px;padding:6px 10px;display:flex;justify-content:space-between;align-items:baseline;gap:6px;font-size:.78rem;min-width:0}
+.break b{font-family:var(--display);font-weight:600;font-size:.95rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.break .profit b{color:#ffe3e8}
+.copy{margin-top:10px;width:100%;font:800 1rem var(--body);color:#4a2228;background:#ffd9df;border:3px solid var(--ink);border-radius:999px;padding:10px;cursor:pointer;box-shadow:0 4px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.copy:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.quote{margin-top:8px;font-size:.76rem;opacity:.9;white-space:pre-wrap;word-break:break-word;user-select:all;text-align:center}
+
+/* settings sheet */
+.scrim{position:fixed;inset:0;background:rgba(40,15,20,.45);z-index:20;opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:var(--card);border-top:3px solid var(--ink);border-radius:26px 26px 0 0;
+  padding:14px max(18px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));
+  max-height:88vh;overflow-y:auto;transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.9,.3,1.1)}
+.sheet.open{transform:none}
+.sheet-in{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheet-head h2{margin:0;font-family:var(--display);font-size:1.15rem;display:flex;align-items:center;gap:6px}
+.sheet-head h2 img{width:44px;height:44px;object-fit:contain}
+.done{font:800 .95rem var(--body);background:var(--potato);color:#fff;border:3px solid var(--ink);border-radius:999px;padding:7px 18px;cursor:pointer;box-shadow:0 3px 0 var(--ink)}
+.grp{font-weight:800;font-size:.78rem;color:var(--muted);letter-spacing:.06em;margin:4px 0 -4px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .seg{display:flex;gap:6px;flex-wrap:wrap}
 .seg button{font:700 .82rem var(--body);color:var(--ink);background:var(--field);border:2.5px solid var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
-.seg button[aria-pressed="true"]{background:var(--sun);color:#4a2228}
+.seg button[aria-pressed="true"]{background:var(--mint)}
+.hint{font-size:.74rem;color:var(--muted);margin:0;line-height:1.5}
+.hint a{color:var(--potato);font-weight:700}
 
-.result{position:relative;background:var(--potato);color:#fff;border:3px solid var(--ink);border-radius:24px;box-shadow:5px 5px 0 var(--ink);padding:18px;overflow:hidden}
-.result .lbl{font-weight:800;font-size:.85rem;opacity:.92;letter-spacing:.05em}
-.result .price{font-family:var(--display);font-weight:700;font-size:clamp(2.4rem,11vw,3.2rem);line-height:1.1;font-variant-numeric:tabular-nums;margin:2px 0 10px;transition:transform .15s}
-.result .price{padding-right:80px}
-.result .price.pop{transform:scale(1.06)}
-.result .price small{font-size:.45em;margin-right:4px;opacity:.9}
-.break{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:.88rem;background:rgba(0,0,0,.14);border-radius:14px;padding:10px 12px;font-variant-numeric:tabular-nums}
-.break b{font-family:var(--display);font-weight:600;text-align:right}
-.break .profit{color:#ffe3e8;font-weight:700}
-.spark{position:absolute;color:var(--sun);font-size:1.4rem;right:16px;top:10px;animation:tw 1.8s ease-in-out infinite}
-.spark.s2{right:46px;top:26px;font-size:.9rem;animation-delay:.6s}
-@keyframes tw{50%{transform:scale(.6) rotate(20deg);opacity:.6}}
-.copy{margin-top:12px;width:100%;font:800 1rem var(--body);color:#4a2228;background:#ffd9df;border:3px solid var(--ink);border-radius:999px;padding:11px;cursor:pointer;box-shadow:0 4px 0 var(--ink);transition:transform .08s,box-shadow .08s}
-.copy:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
-.quote{margin-top:10px;font-size:.8rem;background:rgba(255,255,255,.16);border-radius:12px;padding:8px 10px;white-space:pre-wrap;word-break:break-word;user-select:all}
-
-h2{font-family:var(--display);font-weight:700;font-size:1.1rem;margin:0;display:flex;align-items:center;gap:8px}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th{font-size:.75rem;color:var(--muted);text-align:left;font-weight:700;padding:0 4px 6px;letter-spacing:.04em}
-th:last-child,td:last-child{text-align:right}
-td{padding:8px 4px;border-top:2px dashed var(--dots);font-family:var(--display);font-weight:600}
-td:last-child{color:var(--potato)}
-tr.tap{cursor:pointer}
-tr.tap:hover td{background:var(--field)}
-.foot{text-align:center;font-size:.75rem;color:var(--muted)}
-
-button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--ink);color:var(--card);font-weight:700;padding:10px 18px;border-radius:999px;transition:transform .25s;z-index:5}
+button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140px);background:var(--ink);color:var(--card);font-weight:700;padding:10px 18px;border-radius:999px;transition:transform .25s;z-index:30}
 .toast.show{transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -117,60 +118,32 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-
     <img class="mascot" id="mascot" alt="" src="st/wave.webp" fetchpriority="high">
     <div class="bubble">
       <h1>韓吉代購換算</h1>
-      <p id="say">輸入日幣或韓幣，馬上幫你算台幣報價！</p>
+      <p id="say">輸入價格，馬上算台幣報價！</p>
     </div>
+    <button class="gear" id="open-set" aria-label="設定">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
   </header>
 
-  <section class="card" aria-label="換算設定">
+  <section class="card" aria-label="輸入">
     <div class="tabs" role="group" aria-label="選擇幣別">
       <button id="tab-jpy" aria-pressed="true"><span class="flag">JP</span>日幣 ¥</button>
       <button id="tab-krw" aria-pressed="false"><span class="flag">KR</span>韓幣 ₩</button>
     </div>
-
-    <div class="big">
-      <label for="price">商品價格
+    <div class="price-row">
+      <label for="price" class="big">商品價格
         <div class="field"><span id="sym">¥</span><input id="price" type="text" inputmode="decimal" value="3,980" autocomplete="off"></div>
       </label>
-    </div>
-
-    <div class="row">
       <label for="qty">數量
-        <div class="field"><input id="qty" type="number" inputmode="numeric" min="1" value="1"><span>件</span></div>
-      </label>
-      <label for="rate">現在匯率
-        <div class="field"><input id="rate" type="number" inputmode="decimal" step="0.0001" value="4.9"></div>
+        <div class="stepper"><button id="minus" aria-label="減少">−</button><input id="qty" type="number" inputmode="numeric" min="1" value="1"><button id="plus" aria-label="增加">+</button></div>
       </label>
     </div>
-    <p class="hint">預設匯率只是參考，請改成你今天實際刷卡或換匯的匯率（可查 <a href="https://rate.bot.com.tw/xrt" target="_blank" rel="noopener">台灣銀行牌告</a>）。日韓匯率會分開記住。</p>
-
-    <details id="more" open>
-      <summary>代購費用設定 <img class="deco" data-st="laptop" alt="" src="st/laptop.webp" loading="lazy" style="width:44px;height:44px;margin-left:auto"></summary>
-      <div class="adv">
-        <div class="row">
-          <label for="markup">給客人匯率 <small>報價用這個算</small>
-            <div class="field"><input id="markup" type="number" inputmode="decimal" step="0.01" value="4.7"></div>
-          </label>
-          <label for="fee">代購費 <small>按商品金額</small>
-            <div class="field"><input id="fee" type="number" inputmode="decimal" step="0.5" value="5"><span>%</span></div>
-          </label>
-        </div>
-        <div class="row">
-          <label for="ship">國際運費 <small>每件，台幣</small>
-            <div class="field"><span>$</span><input id="ship" type="number" inputmode="numeric" value="60"></div>
-          </label>
-          <label for="flat">固定手續費 <small>每單，台幣</small>
-            <div class="field"><span>$</span><input id="flat" type="number" inputmode="numeric" value="0"></div>
-          </label>
-        </div>
-        <label>報價取整
-          <div class="seg" role="group" aria-label="報價取整">
-            <button data-round="1" aria-pressed="false">到 1 元</button>
-            <button data-round="5" aria-pressed="false">到 5 元</button>
-            <button data-round="10" aria-pressed="true">到 10 元</button>
-          </div>
-        </label>
-      </div>
-    </details>
+    <button class="summary" id="summary" aria-label="打開設定">
+      <span class="chip" id="c-rate">匯率 —</span>
+      <span class="chip" id="c-quote">給客人 —</span>
+      <span class="chip" id="c-fee">代購費 —</span>
+      <span class="chip" id="c-ship">運費 —</span>
+    </button>
   </section>
 
   <section class="result" aria-live="polite">
@@ -178,33 +151,71 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-
     <div class="lbl">給客人的報價</div>
     <div class="price" id="total"><small>NT$</small>0</div>
     <div class="break">
-      <span>商品原價換算</span><b id="b-raw">—</b>
-      <span>給客人匯率</span><b id="b-rate">—</b>
-      <span>代購費</span><b id="b-fee">—</b>
-      <span>運費＋手續費</span><b id="b-ship">—</b>
-      <span>你的實際成本</span><b id="b-cost">—</b>
-      <span>預估利潤</span><b class="profit" id="b-profit">—</b>
+      <div><span>原價換算</span><b id="b-raw">—</b></div>
+      <div><span>代購費</span><b id="b-fee">—</b></div>
+      <div><span>運費＋手續費</span><b id="b-ship">—</b></div>
+      <div><span>實際成本</span><b id="b-cost">—</b></div>
+      <div class="profit" style="grid-column:1/-1"><span>預估利潤</span><b id="b-profit">—</b></div>
     </div>
     <button class="copy" id="copy">複製報價給客人</button>
     <div class="quote" id="quote"></div>
   </section>
-
-
 </div>
+
+<div class="scrim" id="scrim"></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="set-title" aria-hidden="true">
+  <div class="sheet-in">
+    <div class="sheet-head">
+      <h2 id="set-title"><img src="st/laptop.webp" alt="" loading="lazy">設定</h2>
+      <button class="done" id="close-set">完成</button>
+    </div>
+    <div class="grp" id="grp-rate">日幣匯率（日幣 ÷ 匯率 = 台幣）</div>
+    <div class="row">
+      <label for="rate">現在匯率 <small>算你的成本</small>
+        <div class="field"><input id="rate" type="number" inputmode="decimal" step="0.01" value="4.9"></div>
+      </label>
+      <label for="markup">給客人匯率 <small>報價用這個算</small>
+        <div class="field"><input id="markup" type="number" inputmode="decimal" step="0.01" value="4.7"></div>
+      </label>
+    </div>
+    <p class="hint">日幣、韓幣的匯率分開記住，切換上方幣別就會換。可查 <a href="https://rate.bot.com.tw/xrt" target="_blank" rel="noopener">台灣銀行牌告</a>。</p>
+    <div class="grp">費用（日韓共用）</div>
+    <div class="row">
+      <label for="fee">代購費 <small>按商品金額</small>
+        <div class="field"><input id="fee" type="number" inputmode="decimal" step="0.5" value="5"><span>%</span></div>
+      </label>
+      <label for="ship">國際運費 <small>每件，台幣</small>
+        <div class="field"><span>$</span><input id="ship" type="number" inputmode="numeric" value="60"></div>
+      </label>
+    </div>
+    <div class="row">
+      <label for="flat">固定手續費 <small>每單，台幣</small>
+        <div class="field"><span>$</span><input id="flat" type="number" inputmode="numeric" value="0"></div>
+      </label>
+      <label>報價取整 <small>無條件進位</small>
+        <div class="seg" role="group" aria-label="報價取整">
+          <button data-round="1" aria-pressed="false">1 元</button>
+          <button data-round="5" aria-pressed="false">5 元</button>
+          <button data-round="10" aria-pressed="true">10 元</button>
+        </div>
+      </label>
+    </div>
+  </div>
+</section>
 <div class="toast" id="toast">已複製報價</div>
 
 <script>
-const ST={"wave": "st/wave.webp", "heart": "st/heart.webp", "shy": "st/shy.webp", "box": "st/box.webp", "search": "st/search.webp", "think": "st/think.webp", "laptop": "st/laptop.webp", "cheer": "st/cheer.webp", "letter": "st/letter.webp"};
+const ST={"wave":"st/wave.webp","heart":"st/heart.webp","shy":"st/shy.webp","box":"st/box.webp","search":"st/search.webp","think":"st/think.webp","laptop":"st/laptop.webp","cheer":"st/cheer.webp","letter":"st/letter.webp"};
 const $=id=>document.getElementById(id);
 const CUR={
-  jpy:{sym:"¥",name:"日幣",rate:4.9,steps:[500,1000,2000,3000,5000,8000,10000,20000]},
-  krw:{sym:"₩",name:"韓幣",rate:40,steps:[5000,10000,20000,30000,50000,80000,100000,200000]}
+  jpy:{sym:"¥",name:"日幣",rate:4.9,quote:4.7},
+  krw:{sym:"₩",name:"韓幣",rate:40,quote:39}
 };
-let state={cur:"jpy",round:10,rates:{jpy:CUR.jpy.rate,krw:CUR.krw.rate},quotes:{jpy:4.7,krw:39},
+let state={cur:"jpy",round:10,rates:{jpy:4.9,krw:40},quotes:{jpy:4.7,krw:39},
   prices:{jpy:"3,980",krw:"39,000"},fee:5,ship:60,flat:0,qty:1};
 try{const s=JSON.parse(localStorage.getItem("daigou-v2")||"null");if(s)state={...state,...s,rates:{...state.rates,...s.rates},quotes:{...state.quotes,...s.quotes},prices:{...state.prices,...s.prices}}}catch(e){}
 if(state.rates.jpy<1){state.rates.jpy=4.9;state.quotes.jpy=4.7}
-for(const k of ["jpy","krw"]){if(!(+state.rates[k]>0))state.rates[k]=CUR[k].rate;if(!(+state.quotes[k]>0))state.quotes[k]=k==="jpy"?4.7:39}
+for(const k of ["jpy","krw"]){if(!(+state.rates[k]>0))state.rates[k]=CUR[k].rate;if(!(+state.quotes[k]>0))state.quotes[k]=CUR[k].quote}
 const save=()=>{try{localStorage.setItem("daigou-v2",JSON.stringify(state))}catch(e){}};
 
 const num=v=>{const n=parseFloat(String(v).replace(/[^\d.]/g,""));return isFinite(n)?n:0};
@@ -215,18 +226,16 @@ const roundUp=(n,s)=>Math.ceil(n/s-1e-9)*s;
 function quoteFor(price,qty){
   const rate=num($("rate").value),qr=num($("markup").value),fee=num($("fee").value)/100;
   const ship=num($("ship").value),flat=num($("flat").value);
-  const sub=price*qty;
-  const per=rate>0?1/rate:0, qper=qr>0?1/qr:0, qrate=qr;
+  const sub=price*qty, per=rate>0?1/rate:0, qper=qr>0?1/qr:0;
   const goods=sub*qper, feeAmt=goods*fee, extra=ship*qty+flat;
   const total=roundUp(goods+feeAmt+extra,state.round);
   const cost=sub*per+ship*qty;
-  return {rate,qrate,raw:sub*per,feeAmt,extra,total,cost,profit:total-cost};
+  return {raw:sub*per,feeAmt,extra,total,cost,profit:total-cost};
 }
 
 let curFace="wave";
 Object.values(ST).forEach(u=>{const i=new Image();i.src=u});
 function face(k,msg){$("say").textContent=msg;if(k===curFace)return;curFace=k;const m=$("mascot");m.classList.add("swap");setTimeout(()=>{m.src=ST[k];m.classList.remove("swap")},120)}
-document.querySelectorAll("[data-st]").forEach(i=>i.src=ST[i.dataset.st]);
 
 function render(){
   const c=CUR[state.cur],price=num($("price").value),qty=Math.max(1,Math.round(num($("qty").value)||1));
@@ -234,18 +243,22 @@ function render(){
   const t=$("total");t.innerHTML="<small>NT$</small>"+nt(r.total);
   t.classList.remove("pop");void t.offsetWidth;t.classList.add("pop");setTimeout(()=>t.classList.remove("pop"),150);
   $("b-raw").textContent="$"+nt(r.raw);
-  $("b-rate").textContent="÷ "+r.qrate;
   $("b-fee").textContent="$"+nt(r.feeAmt);
   $("b-ship").textContent="$"+nt(r.extra);
   $("b-cost").textContent="$"+nt(r.cost);
   $("b-profit").textContent=(r.profit>=0?"+$":"−$")+nt(Math.abs(r.profit));
-  $("quote").textContent=`商品 ${c.sym}${fx(price)} × ${qty} 件\n報價 NT$${nt(r.total)}（含代購費、國際運費）`;
-  if(!price) face("search","先輸入商品價格喔～");
-  else if(r.profit<0) face("shy","這樣報價會虧錢，調一下費用吧！");
-  else if(r.total>=10000) face("cheer",`大單！NT$${nt(r.total)} 要確認客人預算～`);
-  else face("wave",`${c.name} ${c.sym}${fx(price)} 報價 NT$${nt(r.total)}！`);
+  $("quote").textContent=`商品 ${c.sym}${fx(price)} × ${qty} 件　報價 NT$${nt(r.total)}（含代購費、國際運費）`;
+  $("c-rate").textContent="匯率 ÷"+num($("rate").value);
+  $("c-quote").textContent="給客人 ÷"+num($("markup").value);
+  $("c-fee").textContent="代購費 "+num($("fee").value)+"%";
+  $("c-ship").textContent="運費 $"+num($("ship").value);
+  $("grp-rate").textContent=`${c.name}匯率（${c.name} ÷ 匯率 = 台幣）`;
   $("res-st").src=r.profit<0?ST.think:ST.heart;
-  
+  if(!price) face("search","先輸入商品價格喔～");
+  else if(!num($("rate").value)||!num($("markup").value)) face("think","匯率還沒填，按右上角設定～");
+  else if(r.profit<0) face("shy","這樣報價會虧錢，調一下設定吧！");
+  else if(r.total>=10000) face("cheer",`大單！NT$${nt(r.total)} 要確認客人預算～`);
+  else face("wave",`${c.sym}${fx(price)} 報價 NT$${nt(r.total)}！`);
   state.prices[state.cur]=$("price").value;state.rates[state.cur]=num($("rate").value);state.quotes[state.cur]=num($("markup").value);
   state.fee=num($("fee").value);state.ship=num($("ship").value);state.flat=num($("flat").value);state.qty=qty;
   save();
@@ -260,13 +273,21 @@ function setCur(k){
   render();
 }
 
+function openSet(o){$("sheet").classList.toggle("open",o);$("scrim").classList.toggle("open",o);$("sheet").setAttribute("aria-hidden",!o);
+  if(o)setTimeout(()=>$("close-set").focus(),50);else $("open-set").focus()}
+$("open-set").onclick=()=>openSet(true);$("summary").onclick=()=>openSet(true);
+$("close-set").onclick=()=>openSet(false);$("scrim").onclick=()=>openSet(false);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")openSet(false)});
+
 $("tab-jpy").onclick=()=>setCur("jpy");$("tab-krw").onclick=()=>setCur("krw");
 ["price","qty","rate","markup","fee","ship","flat"].forEach(id=>$(id).addEventListener("input",render));
 $("price").addEventListener("blur",()=>{const n=num($("price").value);$("price").value=n?fx(n):"";render()});
+$("minus").onclick=()=>{$("qty").value=Math.max(1,(+$("qty").value||1)-1);render()};
+$("plus").onclick=()=>{$("qty").value=(+$("qty").value||0)+1;render()};
 document.querySelectorAll("[data-round]").forEach(b=>b.onclick=()=>{state.round=+b.dataset.round;
   document.querySelectorAll("[data-round]").forEach(x=>x.setAttribute("aria-pressed",x===b));render()});
 $("copy").onclick=()=>{const txt=$("quote").textContent;const ok=()=>{face("letter","報價複製好了，快貼給客人吧！");const t=$("toast");t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600)};
-  try{navigator.clipboard.writeText(txt).then(ok,()=>{selectQ()})}catch(e){selectQ()}};
+  try{navigator.clipboard.writeText(txt).then(ok,selectQ)}catch(e){selectQ()}};
 function selectQ(){const r=document.createRange();r.selectNodeContents($("quote"));const s=getSelection();s.removeAllRanges();s.addRange(r);$("toast").textContent="已選取，長按複製";$("toast").classList.add("show");setTimeout(()=>{$("toast").classList.remove("show");$("toast").textContent="已複製報價"},1800)}
 
 $("fee").value=state.fee;$("ship").value=state.ship;$("flat").value=state.flat;$("qty").value=state.qty;
