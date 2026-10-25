@@ -69,8 +69,8 @@ label small{font-weight:500;color:var(--muted);font-size:.74rem}
 .stepper button{width:32px;height:100%;border:0;background:transparent;font:700 1.3rem var(--display);color:var(--ink);cursor:pointer}
 .stepper input{flex:1;min-width:0;width:100%;border:0;background:transparent;text-align:center;font:600 1.2rem var(--display);color:var(--ink);outline:none;-moz-appearance:textfield}
 .stepper input::-webkit-inner-spin-button,.stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-.summary{display:flex;flex-wrap:wrap;gap:6px;border:0;background:none;padding:0;cursor:pointer;text-align:left}
-.chip{font:700 .76rem var(--body);background:var(--blush);color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:3px 9px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;border:0;background:none;padding:0;cursor:pointer;text-align:left}
+.chip{font:700 .76rem var(--body);background:var(--blush);color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:4px 9px;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center}
 
 .result{position:relative;background:var(--potato);color:#fff;border:3px solid var(--ink);border-radius:22px;box-shadow:4px 4px 0 var(--ink);padding:14px;overflow:hidden}
 .result-st{position:absolute;right:4px;top:2px;width:76px;height:76px;object-fit:contain;transform:rotate(8deg)}
