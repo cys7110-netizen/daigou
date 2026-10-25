@@ -289,7 +289,9 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")openSet(false)});
 
 $("tab-jpy").onclick=()=>setCur("jpy");$("tab-krw").onclick=()=>setCur("krw");
 ["price","qty","rate","markup","fee","ship","flat"].forEach(id=>$(id).addEventListener("input",render));
-$("price").addEventListener("blur",()=>{const n=num($("price").value);$("price").value=n?fx(n):"";render()});
+let prevPrice="";
+$("price").addEventListener("focus",()=>{prevPrice=$("price").value;$("price").value=""});
+$("price").addEventListener("blur",()=>{if($("price").value.trim()===""){$("price").value=prevPrice;return}const n=num($("price").value);$("price").value=n?fx(n):"";render()});
 $("minus").onclick=()=>{$("qty").value=Math.max(1,(+$("qty").value||1)-1);render()};
 $("plus").onclick=()=>{$("qty").value=(+$("qty").value||0)+1;render()};
 document.querySelectorAll("[data-round]").forEach(b=>b.onclick=()=>{state.round=+b.dataset.round;
