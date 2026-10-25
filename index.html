@@ -248,7 +248,7 @@ function render(){
   $("b-ship").textContent="$"+nt(r.extra);
   $("b-cost").textContent="$"+nt(r.cost);
   $("b-profit").textContent=(r.profit>=0?"+$":"−$")+nt(Math.abs(r.profit));
-  $("quote").textContent=`商品 ${c.sym}${fx(price)} × ${qty} 件　報價 NT$${nt(r.total)}（含代購費、國際運費）`;
+  $("quote").textContent=`商品 ${c.sym}${fx(price)} × ${qty} 件　報價 NT$${nt(r.total)}`;
   $("c-rate").textContent="匯率 ÷"+num($("rate").value);
   $("c-quote").textContent="給客人 ÷"+num($("markup").value);
   $("c-fee").textContent="代購費 "+num($("fee").value)+"%";
