@@ -56,8 +56,8 @@ header{display:flex;align-items:center;gap:8px}
 .tabs button[aria-pressed="true"]{background:var(--potato);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
 .tabs .flag{font-family:var(--display);font-size:.75rem;background:var(--card);color:var(--ink);border-radius:999px;padding:0 6px;border:2px solid var(--ink)}
 
-label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.82rem;min-width:0}
-label small{font-weight:500;color:var(--muted);font-size:.74rem}
+label,.lab{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.82rem;min-width:0}
+label small,.lab small{font-weight:500;color:var(--muted);font-size:.74rem}
 .field{display:flex;align-items:center;background:var(--field);border:3px solid var(--ink);border-radius:14px;padding:0 10px;min-width:0}
 .field:focus-within{box-shadow:0 0 0 3px var(--sun)}
 .field span{font-family:var(--display);font-weight:600;color:var(--muted);white-space:nowrap}
@@ -100,8 +100,14 @@ label small{font-weight:500;color:var(--muted);font-size:.74rem}
 .done{font:800 .95rem var(--body);background:var(--potato);color:#fff;border:3px solid var(--ink);border-radius:999px;padding:7px 18px;cursor:pointer;box-shadow:0 3px 0 var(--ink)}
 .grp{font-weight:800;font-size:.78rem;color:var(--muted);letter-spacing:.06em;margin:4px 0 -4px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.seg{display:flex;gap:6px;flex-wrap:wrap}
-.seg button{font:700 .82rem var(--body);color:var(--ink);background:var(--field);border:2.5px solid var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.lab .check{flex-direction:row}
+.check{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.88rem;cursor:pointer;margin-top:4px}
+.check input{appearance:none;-webkit-appearance:none;width:24px;height:24px;margin:0;border:2.5px solid var(--ink);border-radius:8px;background:var(--field);display:grid;place-items:center;cursor:pointer;flex:none}
+.check input:checked{background:var(--mint)}
+.check input:checked::after{content:"";width:6px;height:11px;border:solid var(--ink);border-width:0 3px 3px 0;transform:translate(0,-1px) rotate(45deg)}
+.check input:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.seg button{font:700 .8rem var(--body);color:var(--ink);background:var(--field);border:2.5px solid var(--ink);border-radius:999px;padding:5px 2px;cursor:pointer;white-space:nowrap}
 .seg button[aria-pressed="true"]{background:var(--mint)}
 .hint{font-size:.74rem;color:var(--muted);margin:0;line-height:1.5}
 .hint a{color:var(--potato);font-weight:700}
@@ -193,13 +199,14 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
       <label for="flat">固定手續費 <small>每單，台幣</small>
         <div class="field"><span>$</span><input id="flat" type="number" inputmode="numeric" value="0"></div>
       </label>
-      <label>報價取整 <small>無條件進位</small>
+      <div class="lab">報價取整 <small id="round-hint">無條件進位</small>
         <div class="seg" role="group" aria-label="報價取整">
           <button data-round="1" aria-pressed="false">1 元</button>
           <button data-round="5" aria-pressed="false">5 元</button>
           <button data-round="10" aria-pressed="true">10 元</button>
         </div>
-      </label>
+        <label class="check" for="nearest"><input type="checkbox" id="nearest"><span>四捨五入</span></label>
+      </div>
     </div>
   </div>
 </section>
@@ -222,7 +229,7 @@ const save=()=>{try{localStorage.setItem("daigou-v2",JSON.stringify(state))}catc
 const num=v=>{const n=parseFloat(String(v).replace(/[^\d.]/g,""));return isFinite(n)?n:0};
 const nt=n=>Math.round(n).toLocaleString("zh-TW");
 const fx=n=>n.toLocaleString("zh-TW",{maximumFractionDigits:0});
-const roundUp=(n,s)=>Math.ceil(n/s-1e-9)*s;
+const roundUp=(n,s)=>state.nearest?Math.round(n/s)*s:Math.ceil(n/s-1e-9)*s;
 
 function quoteFor(price,qty){
   const rate=num($("rate").value),qr=num($("markup").value),fee=num($("fee").value)/100;
@@ -254,7 +261,7 @@ function render(){
   $("c-fee").textContent="代購費 "+num($("fee").value)+"%";
   $("c-ship").textContent="運費 $"+num($("ship").value);
   $("grp-rate").textContent=`${c.name}匯率（${c.name} ÷ 匯率 = 台幣）`;
-  $("res-st").src=r.profit<0?ST.think:ST.heart;
+  $("round-hint").textContent=state.nearest?"四捨五入":"無條件進位";$("res-st").src=r.profit<0?ST.think:ST.heart;
   if(!price) face("search","先輸入商品價格喔～");
   else if(!num($("rate").value)||!num($("markup").value)) face("think","匯率還沒填，按右上角設定～");
   else if(r.profit<0) face("shy","這樣報價會虧錢，調一下設定吧！");
@@ -293,6 +300,8 @@ function selectQ(){const r=document.createRange();r.selectNodeContents($("quote"
 
 $("fee").value=state.fee;$("ship").value=state.ship;$("flat").value=state.flat;$("qty").value=state.qty;
 document.querySelectorAll("[data-round]").forEach(x=>x.setAttribute("aria-pressed",+x.dataset.round===state.round));
+$("nearest").checked=!!state.nearest;
+$("nearest").onchange=()=>{state.nearest=$("nearest").checked;render()};
 setCur(state.cur);
 </script>
 
