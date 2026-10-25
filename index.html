@@ -138,7 +138,7 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-
         <div class="field"><input id="qty" type="number" inputmode="numeric" min="1" value="1"><span>件</span></div>
       </label>
       <label for="rate">現在匯率
-        <div class="field"><input id="rate" type="number" inputmode="decimal" step="0.0001" value="0.2050"></div>
+        <div class="field"><input id="rate" type="number" inputmode="decimal" step="0.0001" value="4.9"></div>
       </label>
     </div>
     <p class="hint">預設匯率只是參考，請改成你今天實際刷卡或換匯的匯率（可查 <a href="https://rate.bot.com.tw/xrt" target="_blank" rel="noopener">台灣銀行牌告</a>）。日韓匯率會分開記住。</p>
@@ -148,7 +148,7 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-
       <div class="adv">
         <div class="row">
           <label for="markup">給客人匯率 <small>報價用這個算</small>
-            <div class="field"><input id="markup" type="number" inputmode="decimal" step="0.001" value="0.215"></div>
+            <div class="field"><input id="markup" type="number" inputmode="decimal" step="0.01" value="4.7"></div>
           </label>
           <label for="fee">代購費 <small>按商品金額</small>
             <div class="field"><input id="fee" type="number" inputmode="decimal" step="0.5" value="5"><span>%</span></div>
@@ -205,12 +205,13 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-
 const ST={"wave": "st/wave.webp", "heart": "st/heart.webp", "shy": "st/shy.webp", "box": "st/box.webp", "search": "st/search.webp", "think": "st/think.webp", "laptop": "st/laptop.webp", "cheer": "st/cheer.webp", "letter": "st/letter.webp"};
 const $=id=>document.getElementById(id);
 const CUR={
-  jpy:{sym:"¥",name:"日幣",rate:0.2050,steps:[500,1000,2000,3000,5000,8000,10000,20000]},
+  jpy:{sym:"¥",name:"日幣",rate:4.9,steps:[500,1000,2000,3000,5000,8000,10000,20000]},
   krw:{sym:"₩",name:"韓幣",rate:40,steps:[5000,10000,20000,30000,50000,80000,100000,200000]}
 };
-let state={cur:"jpy",round:10,rates:{jpy:CUR.jpy.rate,krw:CUR.krw.rate},quotes:{jpy:0.215,krw:39},
+let state={cur:"jpy",round:10,rates:{jpy:CUR.jpy.rate,krw:CUR.krw.rate},quotes:{jpy:4.7,krw:39},
   prices:{jpy:"3,980",krw:"39,000"},fee:5,ship:60,flat:0,qty:1};
 try{const s=JSON.parse(localStorage.getItem("daigou-v2")||"null");if(s)state={...state,...s,rates:{...state.rates,...s.rates},quotes:{...state.quotes,...s.quotes},prices:{...state.prices,...s.prices}}}catch(e){}
+if(state.rates.jpy<1){state.rates.jpy=4.9;state.quotes.jpy=4.7}
 const save=()=>{try{localStorage.setItem("daigou-v2",JSON.stringify(state))}catch(e){}};
 
 const num=v=>{const n=parseFloat(String(v).replace(/[^\d.]/g,""));return isFinite(n)?n:0};
@@ -221,8 +222,8 @@ const roundUp=(n,s)=>Math.ceil(n/s-1e-9)*s;
 function quoteFor(price,qty){
   const rate=num($("rate").value),qr=num($("markup").value),fee=num($("fee").value)/100;
   const ship=num($("ship").value),flat=num($("flat").value);
-  const inv=state.cur==="krw", sub=price*qty;
-  const per=inv?(rate>0?1/rate:0):rate, qper=inv?(qr>0?1/qr:0):qr, qrate=qr;
+  const sub=price*qty;
+  const per=rate>0?1/rate:0, qper=qr>0?1/qr:0, qrate=qr;
   const goods=sub*qper, feeAmt=goods*fee, extra=ship*qty+flat;
   const total=roundUp(goods+feeAmt+extra,state.round);
   const cost=sub*per+ship*qty;
@@ -240,7 +241,7 @@ function render(){
   const t=$("total");t.innerHTML="<small>NT$</small>"+nt(r.total);
   t.classList.remove("pop");void t.offsetWidth;t.classList.add("pop");setTimeout(()=>t.classList.remove("pop"),150);
   $("b-raw").textContent="$"+nt(r.raw);
-  $("b-rate").textContent=state.cur==="krw"?"÷ "+r.qrate:"× "+r.qrate;
+  $("b-rate").textContent="÷ "+r.qrate;
   $("b-fee").textContent="$"+nt(r.feeAmt);
   $("b-ship").textContent="$"+nt(r.extra);
   $("b-cost").textContent="$"+nt(r.cost);
@@ -261,8 +262,8 @@ function setCur(k){
   state.cur=k;
   $("tab-jpy").setAttribute("aria-pressed",k==="jpy");$("tab-krw").setAttribute("aria-pressed",k==="krw");
   $("sym").textContent=CUR[k].sym;$("price").value=state.prices[k];
-  $("rate").value=state.rates[k];$("rate").step=k==="jpy"?"0.001":"0.1";
-  $("markup").value=state.quotes[k];$("markup").step=k==="jpy"?"0.001":"0.1";
+  $("rate").value=state.rates[k];$("rate").step=k==="jpy"?"0.01":"0.1";
+  $("markup").value=state.quotes[k];$("markup").step=k==="jpy"?"0.01":"0.1";
   render();
 }
 
