@@ -137,7 +137,7 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-
       <label for="qty">數量
         <div class="field"><input id="qty" type="number" inputmode="numeric" min="1" value="1"><span>件</span></div>
       </label>
-      <label for="rate">匯率 <small id="rate-hint">1 日幣可換多少台幣</small>
+      <label for="rate">現在匯率
         <div class="field"><input id="rate" type="number" inputmode="decimal" step="0.0001" value="0.2050"></div>
       </label>
     </div>
@@ -147,8 +147,8 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-
       <summary>代購費用設定 <img class="deco" data-st="laptop" alt="" src="st/laptop.webp" loading="lazy" style="width:44px;height:44px;margin-left:auto"></summary>
       <div class="adv">
         <div class="row">
-          <label for="markup">匯率加價 <small id="mk-hint">報價匯率 = 匯率 + 這個</small>
-            <div class="field"><span id="mk-sign">+</span><input id="markup" type="number" inputmode="decimal" step="0.001" value="0.010"></div>
+          <label for="markup">給客人匯率 <small>報價用這個算</small>
+            <div class="field"><input id="markup" type="number" inputmode="decimal" step="0.001" value="0.215"></div>
           </label>
           <label for="fee">代購費 <small>按商品金額</small>
             <div class="field"><input id="fee" type="number" inputmode="decimal" step="0.5" value="5"><span>%</span></div>
@@ -179,7 +179,7 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-
     <div class="price" id="total"><small>NT$</small>0</div>
     <div class="break">
       <span>商品原價換算</span><b id="b-raw">—</b>
-      <span>報價匯率</span><b id="b-rate">—</b>
+      <span>給客人匯率</span><b id="b-rate">—</b>
       <span>代購費</span><b id="b-fee">—</b>
       <span>運費＋手續費</span><b id="b-ship">—</b>
       <span>你的實際成本</span><b id="b-cost">—</b>
@@ -206,13 +206,12 @@ const ST={"wave": "st/wave.webp", "heart": "st/heart.webp", "shy": "st/shy.webp"
 const $=id=>document.getElementById(id);
 const CUR={
   jpy:{sym:"¥",name:"日幣",rate:0.2050,steps:[500,1000,2000,3000,5000,8000,10000,20000]},
-  krw:{sym:"₩",name:"韓幣",rate:45,steps:[5000,10000,20000,30000,50000,80000,100000,200000]}
+  krw:{sym:"₩",name:"韓幣",rate:40,steps:[5000,10000,20000,30000,50000,80000,100000,200000]}
 };
-let state={cur:"jpy",round:10,rates:{jpy:CUR.jpy.rate,krw:CUR.krw.rate},markups:{jpy:0.010,krw:2},
+let state={cur:"jpy",round:10,rates:{jpy:CUR.jpy.rate,krw:CUR.krw.rate},quotes:{jpy:0.215,krw:39},
   prices:{jpy:"3,980",krw:"39,000"},fee:5,ship:60,flat:0,qty:1};
-try{const s=JSON.parse(localStorage.getItem("daigou-v1")||"null");if(s)state={...state,...s,rates:{...state.rates,...s.rates},markups:{...state.markups,...s.markups},prices:{...state.prices,...s.prices}}}catch(e){}
-if(state.rates.krw<1){state.rates.krw=45;state.markups.krw=2}
-const save=()=>{try{localStorage.setItem("daigou-v1",JSON.stringify(state))}catch(e){}};
+try{const s=JSON.parse(localStorage.getItem("daigou-v2")||"null");if(s)state={...state,...s,rates:{...state.rates,...s.rates},quotes:{...state.quotes,...s.quotes},prices:{...state.prices,...s.prices}}}catch(e){}
+const save=()=>{try{localStorage.setItem("daigou-v2",JSON.stringify(state))}catch(e){}};
 
 const num=v=>{const n=parseFloat(String(v).replace(/[^\d.]/g,""));return isFinite(n)?n:0};
 const nt=n=>Math.round(n).toLocaleString("zh-TW");
@@ -220,11 +219,10 @@ const fx=n=>n.toLocaleString("zh-TW",{maximumFractionDigits:0});
 const roundUp=(n,s)=>Math.ceil(n/s-1e-9)*s;
 
 function quoteFor(price,qty){
-  const rate=num($("rate").value),mk=num($("markup").value),fee=num($("fee").value)/100;
+  const rate=num($("rate").value),qr=num($("markup").value),fee=num($("fee").value)/100;
   const ship=num($("ship").value),flat=num($("flat").value);
   const inv=state.cur==="krw", sub=price*qty;
-  const per=inv?(rate>0?1/rate:0):rate, qper=inv?(rate-mk>0?1/(rate-mk):0):rate+mk;
-  const qrate=inv?rate-mk:rate+mk;
+  const per=inv?(rate>0?1/rate:0):rate, qper=inv?(qr>0?1/qr:0):qr, qrate=qr;
   const goods=sub*qper, feeAmt=goods*fee, extra=ship*qty+flat;
   const total=roundUp(goods+feeAmt+extra,state.round);
   const cost=sub*per+ship*qty;
@@ -242,7 +240,7 @@ function render(){
   const t=$("total");t.innerHTML="<small>NT$</small>"+nt(r.total);
   t.classList.remove("pop");void t.offsetWidth;t.classList.add("pop");setTimeout(()=>t.classList.remove("pop"),150);
   $("b-raw").textContent="$"+nt(r.raw);
-  $("b-rate").textContent=state.cur==="krw"?"₩"+r.qrate.toFixed(2)+" = $1":r.qrate.toFixed(4);
+  $("b-rate").textContent=state.cur==="krw"?"÷ "+r.qrate:"× "+r.qrate;
   $("b-fee").textContent="$"+nt(r.feeAmt);
   $("b-ship").textContent="$"+nt(r.extra);
   $("b-cost").textContent="$"+nt(r.cost);
@@ -252,9 +250,9 @@ function render(){
   else if(r.profit<0) face("shy","這樣報價會虧錢，調一下費用吧！");
   else if(r.total>=10000) face("cheer",`大單！NT$${nt(r.total)} 要確認客人預算～`);
   else face("wave",`${c.name} ${c.sym}${fx(price)} 報價 NT$${nt(r.total)}！`);
-  $("q-h").textContent=c.name;const kr=state.cur==="krw";$("rate-hint").textContent=kr?"1 台幣可換多少韓幣（韓幣 ÷ 匯率 = 台幣）":"1 日幣可換多少台幣";$("mk-hint").textContent=kr?"報價匯率 = 匯率 − 這個（越小賺越多）":"報價匯率 = 匯率 + 這個";$("mk-sign").textContent=kr?"−":"+";$("res-st").src=r.profit<0?ST.think:ST.heart;
+  $("q-h").textContent=c.name;$("res-st").src=r.profit<0?ST.think:ST.heart;
   $("q-body").innerHTML=c.steps.map(p=>{const q=quoteFor(p,1);return `<tr class="tap" data-p="${p}" tabindex="0"><td>${c.sym}${fx(p)}</td><td>$${nt(q.raw)}</td><td>$${nt(q.total)}</td></tr>`}).join("");
-  state.prices[state.cur]=$("price").value;state.rates[state.cur]=num($("rate").value);state.markups[state.cur]=num($("markup").value);
+  state.prices[state.cur]=$("price").value;state.rates[state.cur]=num($("rate").value);state.quotes[state.cur]=num($("markup").value);
   state.fee=num($("fee").value);state.ship=num($("ship").value);state.flat=num($("flat").value);state.qty=qty;
   save();
 }
@@ -263,8 +261,8 @@ function setCur(k){
   state.cur=k;
   $("tab-jpy").setAttribute("aria-pressed",k==="jpy");$("tab-krw").setAttribute("aria-pressed",k==="krw");
   $("sym").textContent=CUR[k].sym;$("price").value=state.prices[k];
-  $("rate").value=k==="jpy"?state.rates[k].toFixed(4):state.rates[k].toFixed(2);$("rate").step=k==="jpy"?"0.0001":"0.01";
-  $("markup").value=state.markups[k];$("markup").step=k==="jpy"?"0.001":"0.5";
+  $("rate").value=state.rates[k];$("rate").step=k==="jpy"?"0.001":"0.1";
+  $("markup").value=state.quotes[k];$("markup").step=k==="jpy"?"0.001":"0.1";
   render();
 }
 
