@@ -189,15 +189,7 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-
     <div class="quote" id="quote"></div>
   </section>
 
-  <section class="card" aria-label="快速對照表">
-    <h2><img class="deco" data-st="box" alt="" src="st/box.webp" loading="lazy">常見價位對照 <small style="font-size:.75rem;color:var(--muted);font-weight:600">點一下帶入</small></h2>
-    <table>
-      <thead><tr><th id="q-h">日幣</th><th>原價換算</th><th>報價（1 件）</th></tr></thead>
-      <tbody id="q-body"></tbody>
-    </table>
-  </section>
 
-  <p class="foot"><img class="deco" data-st="letter" alt="" src="st/letter.webp" loading="lazy" style="display:block;margin:0 auto 4px">設定只存在你這台裝置上</p>
 </div>
 <div class="toast" id="toast">已複製報價</div>
 
@@ -212,6 +204,7 @@ let state={cur:"jpy",round:10,rates:{jpy:CUR.jpy.rate,krw:CUR.krw.rate},quotes:{
   prices:{jpy:"3,980",krw:"39,000"},fee:5,ship:60,flat:0,qty:1};
 try{const s=JSON.parse(localStorage.getItem("daigou-v2")||"null");if(s)state={...state,...s,rates:{...state.rates,...s.rates},quotes:{...state.quotes,...s.quotes},prices:{...state.prices,...s.prices}}}catch(e){}
 if(state.rates.jpy<1){state.rates.jpy=4.9;state.quotes.jpy=4.7}
+for(const k of ["jpy","krw"]){if(!(+state.rates[k]>0))state.rates[k]=CUR[k].rate;if(!(+state.quotes[k]>0))state.quotes[k]=k==="jpy"?4.7:39}
 const save=()=>{try{localStorage.setItem("daigou-v2",JSON.stringify(state))}catch(e){}};
 
 const num=v=>{const n=parseFloat(String(v).replace(/[^\d.]/g,""));return isFinite(n)?n:0};
@@ -251,8 +244,8 @@ function render(){
   else if(r.profit<0) face("shy","這樣報價會虧錢，調一下費用吧！");
   else if(r.total>=10000) face("cheer",`大單！NT$${nt(r.total)} 要確認客人預算～`);
   else face("wave",`${c.name} ${c.sym}${fx(price)} 報價 NT$${nt(r.total)}！`);
-  $("q-h").textContent=c.name;$("res-st").src=r.profit<0?ST.think:ST.heart;
-  $("q-body").innerHTML=c.steps.map(p=>{const q=quoteFor(p,1);return `<tr class="tap" data-p="${p}" tabindex="0"><td>${c.sym}${fx(p)}</td><td>$${nt(q.raw)}</td><td>$${nt(q.total)}</td></tr>`}).join("");
+  $("res-st").src=r.profit<0?ST.think:ST.heart;
+  
   state.prices[state.cur]=$("price").value;state.rates[state.cur]=num($("rate").value);state.quotes[state.cur]=num($("markup").value);
   state.fee=num($("fee").value);state.ship=num($("ship").value);state.flat=num($("flat").value);state.qty=qty;
   save();
@@ -272,9 +265,6 @@ $("tab-jpy").onclick=()=>setCur("jpy");$("tab-krw").onclick=()=>setCur("krw");
 $("price").addEventListener("blur",()=>{const n=num($("price").value);$("price").value=n?fx(n):"";render()});
 document.querySelectorAll("[data-round]").forEach(b=>b.onclick=()=>{state.round=+b.dataset.round;
   document.querySelectorAll("[data-round]").forEach(x=>x.setAttribute("aria-pressed",x===b));render()});
-const pick=tr=>{$("price").value=fx(+tr.dataset.p);render();window.scrollTo({top:0,behavior:"smooth"})};
-$("q-body").addEventListener("click",e=>{const tr=e.target.closest("tr");if(tr)pick(tr)});
-$("q-body").addEventListener("keydown",e=>{const tr=e.target.closest("tr");if(tr&&(e.key==="Enter"||e.key===" ")){e.preventDefault();pick(tr)}});
 $("copy").onclick=()=>{const txt=$("quote").textContent;const ok=()=>{face("letter","報價複製好了，快貼給客人吧！");const t=$("toast");t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600)};
   try{navigator.clipboard.writeText(txt).then(ok,()=>{selectQ()})}catch(e){selectQ()}};
 function selectQ(){const r=document.createRange();r.selectNodeContents($("quote"));const s=getSelection();s.removeAllRanges();s.addRange(r);$("toast").textContent="已選取，長按複製";$("toast").classList.add("show");setTimeout(()=>{$("toast").classList.remove("show");$("toast").textContent="已複製報價"},1800)}
