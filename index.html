@@ -8,6 +8,11 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff6f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#2a1a1e" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="韓吉計算機">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,6 +36,7 @@ html,body{margin:0}
   --potato:#d9607b; --mint:#3d6b52; --sun:#ffd25e; --sky:#7cbcf0; --field:#4a2d34; --blush:#5a3640; color-scheme:dark}
 
 *{box-sizing:border-box}
+html{background:var(--bg)}
 body{background:var(--bg);background-image:radial-gradient(var(--dots) 2px,transparent 2.5px);background-size:22px 22px;color:var(--ink);font-family:var(--body);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 20px}
 body{min-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));min-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;justify-content:center}
