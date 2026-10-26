@@ -254,14 +254,19 @@ Object.values(ST).forEach(u=>{const i=new Image();i.src=u});
 function face(k,msg){$("say").textContent=msg;if(k===curFace)return;curFace=k;const m=$("mascot");m.classList.add("swap");setTimeout(()=>{m.src=ST[k];m.classList.remove("swap")},120)}
 
 const MOODS=[
-  {min:50000,st:"cheer",say:["財神來了！"]},
-  {min:20000,st:"cheer",say:["是大單，希望成交！"]},
-  {min:8000,st:"heart",say:["今天可以吃好吃的了！"]},
-  {min:2000,st:"wave",say:["加油，離財富自由差一步！"]},
-  {min:0,st:"wave",say:["今天可以多喝一杯飲料了🫶🏻"]}
+  {min:100000,st:"cheer",say:["財神來了！韓吉要準備數錢了！"]},
+  {min:80000,st:"cheer",say:["韓吉：這筆可以開香檳嗎？🍠"]},
+  {min:50000,st:"wave",say:["財神路過，韓吉趕快揮手招呼！"]},
+  {min:30000,st:"cheer",say:["今天的業績有點厲害喔！"]},
+  {min:20000,st:"box",say:["大單出現！韓吉開始認真打包了"]},
+  {min:12000,st:"search",say:["這筆很可以，韓吉眼睛亮起來了✨"]},
+  {min:8000,st:"wave",say:["今天走路好像都比較有風～"]},
+  {min:5000,st:"heart",say:["不錯喔，晚餐可以加一道菜了！"]},
+  {min:2000,st:"heart",say:["今天可以多喝一杯飲料了🫶🏻"]},
+  {min:-1,st:"wave",say:["小小進帳，韓吉替你開心！"]}
 ];
 let moodTier=-1,moodLine="";
-function mood(total){const i=MOODS.findIndex(m=>total>=m.min);
+function mood(total){const i=MOODS.findIndex(m=>total>m.min);
   if(i!==moodTier){moodTier=i;const L=MOODS[i].say;moodLine=L[Math.floor(Math.random()*L.length)]}
   face(MOODS[i].st,moodLine)}
 function render(){
