@@ -57,8 +57,8 @@ header{display:flex;align-items:center;gap:8px}
 .gear svg{width:24px;height:24px}
 
 .card{background:var(--card);border:3px solid var(--ink);border-radius:22px;box-shadow:4px 4px 0 var(--ink);padding:14px;display:flex;flex-direction:column;gap:10px}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--field);border:3px solid var(--ink);border-radius:999px;padding:3px}
-.tabs button{font:700 .95rem var(--body);color:var(--ink);background:transparent;border:0;border-radius:999px;padding:7px 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--field);border:3px solid var(--ink);border-radius:999px;padding:3px}
+.tabs button{font:700 .9rem var(--body);white-space:nowrap;min-width:0;color:var(--ink);background:transparent;border:0;border-radius:999px;padding:7px 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
 .tabs button[aria-pressed="true"]{background:var(--potato);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
 .tabs .flag{font-family:var(--display);font-size:.75rem;background:var(--card);color:var(--ink);border-radius:999px;padding:0 6px;border:2px solid var(--ink)}
 
@@ -142,6 +142,7 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
     <div class="tabs" role="group" aria-label="選擇幣別">
       <button id="tab-krw" aria-pressed="false"><span class="flag">KR</span>韓幣 ₩</button>
       <button id="tab-jpy" aria-pressed="true"><span class="flag">JP</span>日幣 ¥</button>
+      <button id="tab-eur" aria-pressed="false"><span class="flag">EU</span>歐元 €</button>
     </div>
     <div class="price-row">
       <label for="price" class="big">商品價格
@@ -191,8 +192,8 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
         <div class="field"><input id="markup" type="number" inputmode="decimal" step="0.01" value="4.7"></div>
       </label>
     </div>
-    <p class="hint">日幣、韓幣的匯率分開記住，切換上方幣別就會換。可查 <a href="https://rate.bot.com.tw/xrt" target="_blank" rel="noopener">台灣銀行牌告</a>。</p>
-    <div class="grp">費用（日韓共用）</div>
+    <p class="hint">每種幣別的匯率分開記住，切換上方幣別就會換。可查 <a href="https://rate.bot.com.tw/xrt" target="_blank" rel="noopener">台灣銀行牌告</a>。</p>
+    <div class="grp">費用（所有幣別共用）</div>
     <div class="row">
       <label for="fee">代購費 <small>按商品金額</small>
         <div class="field"><input id="fee" type="number" inputmode="decimal" step="0.5" value="5"><span>%</span></div>
@@ -223,24 +224,25 @@ const ST={"wave":"st/wave.webp","heart":"st/heart.webp","shy":"st/shy.webp","box
 const $=id=>document.getElementById(id);
 const CUR={
   jpy:{sym:"¥",name:"日幣",rate:4.9,quote:4.7},
-  krw:{sym:"₩",name:"韓幣",rate:40,quote:39}
+  krw:{sym:"₩",name:"韓幣",rate:40,quote:39},
+  eur:{sym:"€",name:"歐元",rate:36,quote:37,mul:true}
 };
-let state={cur:"krw",round:10,rates:{jpy:4.9,krw:40},quotes:{jpy:4.7,krw:39},
-  prices:{jpy:"3,980",krw:"39,000"},fee:5,ship:60,flat:0,qty:1};
+let state={cur:"krw",round:10,rates:{jpy:4.9,krw:40,eur:36},quotes:{jpy:4.7,krw:39,eur:37},
+  prices:{jpy:"3,980",krw:"39,000",eur:"120"},fee:5,ship:60,flat:0,qty:1};
 try{const s=JSON.parse(localStorage.getItem("daigou-v2")||"null");if(s)state={...state,...s,rates:{...state.rates,...s.rates},quotes:{...state.quotes,...s.quotes},prices:{...state.prices,...s.prices}}}catch(e){}
 if(state.rates.jpy<1){state.rates.jpy=4.9;state.quotes.jpy=4.7}
-for(const k of ["jpy","krw"]){if(!(+state.rates[k]>0))state.rates[k]=CUR[k].rate;if(!(+state.quotes[k]>0))state.quotes[k]=CUR[k].quote}
+for(const k of ["jpy","krw","eur"]){if(!(+state.rates[k]>0))state.rates[k]=CUR[k].rate;if(!(+state.quotes[k]>0))state.quotes[k]=CUR[k].quote}
 const save=()=>{try{localStorage.setItem("daigou-v2",JSON.stringify(state))}catch(e){}};
 
 const num=v=>{const n=parseFloat(String(v).replace(/[^\d.]/g,""));return isFinite(n)?n:0};
 const nt=n=>Math.round(n).toLocaleString("zh-TW");
-const fx=n=>n.toLocaleString("zh-TW",{maximumFractionDigits:0});
+const fx=n=>n.toLocaleString("zh-TW",{maximumFractionDigits:2});
 const roundUp=(n,s)=>state.nearest?Math.round(n/s)*s:Math.ceil(n/s-1e-9)*s;
 
 function quoteFor(price,qty){
   const rate=num($("rate").value),qr=num($("markup").value),fee=num($("fee").value)/100;
   const ship=num($("ship").value),flat=num($("flat").value);
-  const sub=price*qty, per=rate>0?1/rate:0, qper=qr>0?1/qr:0;
+  const mul=CUR[state.cur].mul, sub=price*qty, per=mul?rate:(rate>0?1/rate:0), qper=mul?qr:(qr>0?1/qr:0);
   const goods=sub*qper, feeAmt=goods*fee, extra=ship*qty+flat;
   const total=roundUp(goods+feeAmt+extra,state.round);
   const cost=sub*per+ship*qty;
@@ -262,11 +264,11 @@ function render(){
   $("b-cost").textContent="$"+nt(r.cost);
   $("b-profit").textContent=(r.profit>=0?"+$":"−$")+nt(Math.abs(r.profit));
   $("quote").textContent=`商品 ${c.sym}${fx(price)} × ${qty} 件　報價 NT$${nt(r.total)}`;
-  $("c-rate").textContent="匯率 ÷"+num($("rate").value);
-  $("c-quote").textContent="給客人 ÷"+num($("markup").value);
+  const op=c.mul?"×":"÷";$("c-rate").textContent="匯率 "+op+num($("rate").value);
+  $("c-quote").textContent="給客人 "+op+num($("markup").value);
   $("c-fee").textContent="代購費 "+num($("fee").value)+"%";
   $("c-ship").textContent="運費 $"+num($("ship").value);
-  $("grp-rate").textContent=`${c.name}匯率（${c.name} ÷ 匯率 = 台幣）`;
+  $("grp-rate").textContent=`${c.name}匯率（${c.name} ${op} 匯率 = 台幣）`;
   $("round-hint").textContent=state.nearest?"四捨五入":"無條件進位";$("res-st").src=r.profit<0?ST.think:ST.heart;
   if(!price) face("search","先輸入商品價格喔～");
   else if(!num($("rate").value)||!num($("markup").value)) face("think","匯率還沒填，按右上角設定～");
@@ -280,7 +282,7 @@ function render(){
 
 function setCur(k){
   state.cur=k;
-  $("tab-jpy").setAttribute("aria-pressed",k==="jpy");$("tab-krw").setAttribute("aria-pressed",k==="krw");
+  for(const x of ["jpy","krw","eur"])$("tab-"+x).setAttribute("aria-pressed",k===x);
   $("sym").textContent=CUR[k].sym;$("price").value=state.prices[k];
   $("rate").value=state.rates[k];$("rate").step=k==="jpy"?"0.01":"0.1";
   $("markup").value=state.quotes[k];$("markup").step=k==="jpy"?"0.01":"0.1";
@@ -293,7 +295,7 @@ $("open-set").onclick=()=>openSet(true);$("summary").onclick=()=>openSet(true);
 $("close-set").onclick=()=>openSet(false);$("scrim").onclick=()=>openSet(false);
 document.addEventListener("keydown",e=>{if(e.key==="Escape")openSet(false)});
 
-$("tab-jpy").onclick=()=>setCur("jpy");$("tab-krw").onclick=()=>setCur("krw");
+for(const x of ["jpy","krw","eur"])$("tab-"+x).onclick=()=>setCur(x);
 ["price","qty","rate","markup","fee","ship","flat"].forEach(id=>$(id).addEventListener("input",render));
 let prevPrice="";
 $("price").addEventListener("focus",()=>{prevPrice=$("price").value;$("price").value=""});
