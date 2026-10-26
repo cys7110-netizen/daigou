@@ -253,6 +253,17 @@ let curFace="wave";
 Object.values(ST).forEach(u=>{const i=new Image();i.src=u});
 function face(k,msg){$("say").textContent=msg;if(k===curFace)return;curFace=k;const m=$("mascot");m.classList.add("swap");setTimeout(()=>{m.src=ST[k];m.classList.remove("swap")},120)}
 
+const MOODS=[
+  {min:50000,st:"cheer",say:["財神來了！快接住～","發財發財，恭喜恭喜！","這單做完可以去韓國玩了～","今天是被財神眷顧的一天！"]},
+  {min:20000,st:"cheer",say:["加油加油，快財富自由了⋯","大單來啦！衝衝衝～","老闆今天要請客嗎？","錢錢在向你招手～"]},
+  {min:8000,st:"heart",say:["哇～這單很可以喔！","收單收到手軟～","客人眼光真好，你也真棒！","今天的晚餐加個蛋！"]},
+  {min:2000,st:"wave",say:["穩穩賺，今天也很棒！","離財富自由又近一步～","一單一單，慢慢變有錢！","代購人的日常，努力中！"]},
+  {min:0,st:"wave",say:["小小單也是愛～","積少成多，螞蟻搬家！","一杯珍奶的錢入袋～","每一單都很珍貴喔！"]}
+];
+let moodTier=-1,moodLine="";
+function mood(total){const i=MOODS.findIndex(m=>total>=m.min);
+  if(i!==moodTier){moodTier=i;const L=MOODS[i].say;moodLine=L[Math.floor(Math.random()*L.length)]}
+  face(MOODS[i].st,moodLine)}
 function render(){
   const c=CUR[state.cur],price=num($("price").value),qty=Math.max(1,Math.round(num($("qty").value)||1));
   const r=quoteFor(price,qty);
@@ -270,11 +281,10 @@ function render(){
   $("c-ship").textContent="運費 $"+num($("ship").value);
   $("grp-rate").textContent=`${c.name}匯率（${c.name} ${op} 匯率 = 台幣）`;
   $("round-hint").textContent=state.nearest?"四捨五入":"無條件進位";$("res-st").src=r.profit<0?ST.think:ST.heart;
-  if(!price) face("search","先輸入商品價格喔～");
+  if(!price) {moodTier=-1;face("search","先輸入商品價格喔～")}
   else if(!num($("rate").value)||!num($("markup").value)) face("think","匯率還沒填，按右上角設定～");
-  else if(r.profit<0) face("shy","這樣報價會虧錢，調一下設定吧！");
-  else if(r.total>=10000) face("cheer",`${c.sym}${fx(price)} 報價 NT$${nt(r.total)}！`);
-  else face("wave",`${c.sym}${fx(price)} 報價 NT$${nt(r.total)}！`);
+  else if(r.profit<0) {moodTier=-1;face("shy","這單會虧錢，調一下設定吧！")}
+  else mood(r.total);
   state.prices[state.cur]=$("price").value;state.rates[state.cur]=num($("rate").value);state.quotes[state.cur]=num($("markup").value);
   state.fee=num($("fee").value);state.ship=num($("ship").value);state.flat=num($("flat").value);state.qty=qty;
   save();
